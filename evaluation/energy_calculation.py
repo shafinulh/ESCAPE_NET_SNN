@@ -32,9 +32,9 @@ vgg['conv5-2'] = (3, 2, 2, 512, 512, 16)
 vgg['conv5-3'] = (3, 2, 2, 512, 512, 15)
 
 escape_net = {}
-escape_net['conv1'] = (8, 56, 100, 1, 64, 3.81)
-escape_net['conv2'] = (4, 28, 50, 64, 64, 7.63)
-escape_net['conv3'] = (2, 14, 25, 64, 64, 6.36)
+escape_net['conv1'] = (8, 56, 100, 1, 64, 0.314)
+escape_net['conv2'] = (4, 28, 50, 64, 64, 0.685)
+escape_net['conv3'] = (2, 14, 25, 64, 64, 0.542)
 escape_net['linear1'] = (22400, 256, 6.05)
 escape_net['linear2'] = (256, 3, 11.03)
 

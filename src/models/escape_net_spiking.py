@@ -96,6 +96,7 @@ class ESCAPE_NET_SNN_STDB(nn.Module):
     self.mem 			= {}
     self.mask 			 = {}
     self.spike 			 = {}
+    self.spikes      = {}
     self.avg_spike_dict = {}
     self.conv_layers = []
     self.fc_layers   = []
@@ -224,7 +225,8 @@ class ESCAPE_NET_SNN_STDB(nn.Module):
       
       elif isinstance(self.classifier[l], nn.Dropout):
         self.mask[prev+l] = self.classifier[l](torch.ones(self.mem[prev+l-2].shape))
-        
+    
+    self.spikes = copy.deepcopy(self.mem)
     self.spike = copy.deepcopy(self.mem)
     for key, values in self.spike.items():
       for value in values:
@@ -249,6 +251,7 @@ class ESCAPE_NET_SNN_STDB(nn.Module):
 
           mem_thr 		= (self.mem[l]/self.threshold[l]) - 1.0
           out 			= self.act_func(mem_thr, (t-1-self.spike[l]))
+          self.spikes[l] = self.spikes[l] + out
           rst 			= self.threshold[l]* (mem_thr>0).float()
           self.spike[l] 	= self.spike[l].masked_fill(out.bool(),t-1)
           self.mem[l] 	= (self.leak*self.mem[l] + self.features[l](out_prev) - rst)
@@ -277,6 +280,7 @@ class ESCAPE_NET_SNN_STDB(nn.Module):
 
           mem_thr 			= (self.mem[prev+l]/self.threshold[prev+l]) - 1.0
           out 				= self.act_func(mem_thr, (t-1-self.spike[prev+l]))
+          self.spikes[prev+l] = self.spikes[prev+l] + out
           rst 				= self.threshold[prev+l] * (mem_thr>0).float()
           self.spike[prev+l] 	= self.spike[prev+l].masked_fill(out.bool(),t-1)
           self.mem[prev+l] 	= (self.leak*self.mem[prev+l] + self.classifier[l](out_prev) - rst)
@@ -291,43 +295,62 @@ class ESCAPE_NET_SNN_STDB(nn.Module):
         self.mem[prev+l+1] 	= self.mem[prev+l+1] + self.classifier[l+1](out_prev)
     if find_max_mem:
       return max_mem
-    self.count_spikes() #the number of spikes in a given layer averaged over the current batch 
 
     return self.mem[prev+l+1]
 
-  def count_spikes(self):
-    res = 0
-    for layer in self.conv_layers: #convolutional layers
-      res = 0
-      torch.nn.functional.relu(self.spike[layer], inplace=True)
-      for i, _ in enumerate(self.spike[layer]):
-        res += torch.sum(self.spike[layer][i])
-      res/=len(self.spike[layer])
-      # print(res)
-      self.avg_spike_dict[layer].append(res.item())
 
-    for layer in self.fc_layers: #linear layers
-      res = 0
-      torch.nn.functional.relu(self.spike[layer], inplace=True)
-      for i, _ in enumerate(self.spike[layer]):
-        res += torch.sum(self.spike[layer][i])
-      res/=len(self.spike[layer])
-      # print(res)
-      self.avg_spike_dict[layer].append(res.item())
+def count_spikes(model, spike):
+  '''
+  the number of spikes in a given layer averaged over the current batch 
+  '''
+  batch_avg_spikerates = {}
+  conv_layers = model.module.conv_layers
+  fc_layers = model.module.fc_layers
+  # spike = model.module.spikes
+  res = 0
+  for layer in conv_layers: #convolutional layers
+    res = 0
+    torch.nn.functional.relu(spike[layer], inplace=True)
+    for i, _ in enumerate(spike[layer]):
+      res += torch.sum(spike[layer][i])
+    res/=len(spike[layer])
+    # print(res)
+    batch_avg_spikerates.setdefault(layer, []).append(res.item())
+
+  for x in fc_layers: #linear layers
+    res = 0
+    torch.nn.functional.relu(spike[x], inplace=True)
+    for i, _ in enumerate(spike[x]):
+      res += torch.sum(spike[x][i])
+    res/=len(spike[x])
+    # print(res)
+    batch_avg_spikerates.setdefault(x, []).append(res.item())
+
+  return batch_avg_spikerates
 
 def test():
-      net = ESCAPE_NET_SNN_STDB('ESCAPE_NET')
-      x = torch.randn(1,1,56,100)
-      net = nn.DataParallel(net) 
-      if torch.cuda.is_available():
-        torch.set_default_tensor_type('torch.cuda.FloatTensor')
-        net.cuda()
-        x = x.cuda()
-      y = net(x)
-      print(net.module.avg_spike_dict)
-      # print(y.size())
+    # Seed random number
+    torch.manual_seed(0)
+    np.random.seed(0)
+    torch.cuda.manual_seed(0)
+    torch.cuda.manual_seed_all(0)
+
+    net = ESCAPE_NET_SNN_STDB('ESCAPE_NET', timesteps = 100)
+    x = torch.randn(1,1,56,100)
+    net = nn.DataParallel(net) 
+    if torch.cuda.is_available():
+      torch.set_default_tensor_type('torch.cuda.FloatTensor')
+      net.cuda()
+      x = x.cuda()
+
+    y = net(x)
+    avg_spikerates = count_spikes(net, net.module.spike)
+    print(avg_spikerates)
+    avg_spikerates = count_spikes(net, net.module.spikes)
+    print(avg_spikerates)
+    # print(y.size())
 
 if __name__ == '__main__':
-    test()
-    # test_model = ESCAPE_NET_SNN_STDB(model_name='ESCAPE_NET', labels=3, dataset='RAT4', kernel_size=8, dropout=0.2)
-    # print(test_model)
+  test()
+  # test_model = ESCAPE_NET_SNN_STDB(model_name='ESCAPE_NET', labels=3, dataset='RAT4', kernel_size=8, dropout=0.2)
+  # print(test_model)

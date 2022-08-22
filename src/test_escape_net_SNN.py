@@ -105,7 +105,7 @@ def inference(epoch):
                     )
                 )
 
-            batch_avg_spike_data = count_spikes(batch_avg_spikerates)
+            batch_avg_spike_data = get_batch_avg_spikerates(batch_avg_spikerates)
         
         temp1 = []
         for value in model.module.threshold.values():
@@ -123,10 +123,10 @@ def inference(epoch):
         avg_spikerates = get_avg_spikerates(batch_avg_spikerates)
         return avg_spikerates
 
-def count_spikes(batch_avg_spikerates):
+def get_batch_avg_spikerates(batch_avg_spikerates):
     conv_layers = model.module.conv_layers
     fc_layers = model.module.fc_layers
-    spike = model.module.spike
+    spike = model.module.spikes
     res = 0
     for layer in conv_layers: #convolutional layers
       res = 0
@@ -148,18 +148,18 @@ def count_spikes(batch_avg_spikerates):
 
     return batch_avg_spikerates
 
+
 def get_avg_spikerates(batch_avg_spikerates):
     layer_dict = {0: 'conv1', 3: 'conv2', 6: 'conv3', 8: 'linear1', 10: 'linear2'}
     avg_spikerates = {}
-    timesteps = timesteps
     samples = len(batch_avg_spikerates[0])*batch_size 
     neurons = [64*56*100, 64*28*50, 64*14*25, 256, 3]
-    f.write('data averaged over {0} samples:'.format(samples))
+    f.write('\n data averaged over {0} samples:'.format(samples))
     for i, layer in enumerate(batch_avg_spikerates.keys()):
         avg_spikes = sum(batch_avg_spikerates[layer])/len(batch_avg_spikerates[layer])
         avg_spikerate = (avg_spikes/neurons[i])
         avg_spikerates.setdefault(layer, avg_spikerate)
-        f.write(f'{layer_dict[layer]}: {avg_spikes:.0f} spikes, {neurons[i]} neurons, {avg_spikerate:.3f} avg spiking rate')
+        f.write(f'\n\t{layer_dict[layer]}: {avg_spikes:.0f} spikes, {neurons[i]} neurons, {avg_spikerate:.3f} avg spiking rate')
     return avg_spikerates
 
 def loss_accuracy_curves():
@@ -226,7 +226,7 @@ if __name__ == '__main__':
     parser.add_argument('-lr',                      default=1e-4,               type=float,     help='initial learning_rate')
     parser.add_argument('--pretrained_ann',         default='',                 type=str,       help='pretrained ANN model')
     parser.add_argument('--pretrained_snn',         default='',                 type=str,       help='pretrained SNN for inference')
-    parser.add_argument('--log',                    default=True,             type=bool,      help='to print the output on terminal or to log file')
+    parser.add_argument('--log',                    default=False,             type=bool,      help='to print the output on terminal or to log file')
     parser.add_argument('--epochs',                 default=10,                 type=int,       help='number of training epochs')
     parser.add_argument('--timesteps',              default=28,                 type=int,       help='simulation timesteps')
     parser.add_argument('--leak',                   default=1.0,                type=float,     help='membrane leak')
@@ -263,7 +263,7 @@ if __name__ == '__main__':
     batch_size          = args.batch_size
     architecture        = 'ESCAPE_NET'
     # pretrained_snn      = args.pretrained_snn
-    pretrained_snn      = 'D:/Users/shafi/OneDrive/OneDrive - University of Toronto/ISML_22/snn_conversion_2/trained_models/snn/snn_escape_net_727_28_1.pth'
+    pretrained_snn      = 'D:/Users/shafi/OneDrive/OneDrive - University of Toronto/ISML_22/snn_conversion_2/trained_models/snn_old/snn_escape_net_727_28_1.pth'
     epochs              = args.epochs
     timesteps           = args.timesteps
     leak                = args.leak
