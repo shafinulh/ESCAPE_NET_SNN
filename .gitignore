@@ -1,0 +1,5 @@
+snn_model_accuracies.xlsx
+
+trained_models/
+
+data/processed/Rat4Training_Fold1.mat
