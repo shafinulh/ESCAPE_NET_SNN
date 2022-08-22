@@ -69,7 +69,7 @@ class AverageMeter(object):
         fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
         return fmtstr.format(**self.__dict__)
       
-def test(epoch):
+def inference(epoch):
     global history
     global batch_avg_spikerates
 
@@ -162,28 +162,58 @@ def get_avg_spikerates(batch_avg_spikerates):
         f.write(f'{layer_dict[layer]}: {avg_spikes:.0f} spikes, {neurons[i]} neurons, {avg_spikerate:.3f} avg spiking rate')
     return avg_spikerates
 
-def confusion_matrix():
-    pass
-
-def error_vs_time():
-    pass
-
-def spikerates():
-    pass
-
-def spikerates_distribution():
-    pass
-
-def spiketrains():
-    pass
-
-def energy_calculation():
-    pass
-
 def loss_accuracy_curves():
+    '''
+    to analyze the spike based backpropagation learning
+
+    In the future, try and implement the use of tensorboard
+    '''
+    pass
+
+def confusion_matrix():
+    '''
+    basic plot of the trained SNN's predictions. COMPARE to the corresponding ANN
+    '''
     pass
 
 def input_image():
+    '''
+    Plot a sample raw image (spatio-temporal signature) and plot a corresponding 
+    heatmap of the poisson spiking rates for the input image to be fed into the SNN.
+
+    Input image created and stored under model.module.input_layer
+    '''
+    pass
+
+def layerwise_spikerates():
+    '''
+    For a given sample, plot the spikerate frequency of neuron of each layer
+    '''
+    pass
+
+def error_vs_time():
+    '''
+    For converted only SNN, determine the number of timesteps required to converge to ANN performance
+    '''
+    pass
+
+def spikerates_distribution():
+    '''
+    Histogram of the number of neurons spiking at a certain frequency
+    '''
+    pass
+
+def spiketrains():
+    '''
+    Plot of the neurons that are firing at each timestep of a simulation
+    '''
+    pass
+
+def energy_calculation():
+    '''
+    Giving the avg spikerate of each layer, calculate the theoretical energy savings using 
+    empirical data found in literature
+    '''
     pass
 
 if __name__ == '__main__':
@@ -338,4 +368,4 @@ if __name__ == '__main__':
     avg_spike_dict ={}
 
     start_time = datetime.datetime.now()
-    avg_spikerates = test(1)
+    avg_spikerates = inference(1)
