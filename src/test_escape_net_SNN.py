@@ -262,8 +262,8 @@ if __name__ == '__main__':
     dataset             = args.dataset
     batch_size          = args.batch_size
     architecture        = 'ESCAPE_NET'
-    # pretrained_snn      = args.pretrained_snn
-    pretrained_snn      = 'D:/Users/shafi/OneDrive/OneDrive - University of Toronto/ISML_22/snn_conversion_2/trained_models/snn_old/snn_escape_net_727_28_1.pth'
+    pretrained_snn      = args.pretrained_snn
+    # pretrained_snn      = 'D:/Users/shafi/OneDrive/OneDrive - University of Toronto/ISML_22/snn_conversion_2/trained_models/snn_old/snn_escape_net_727_28_1.pth'
     epochs              = args.epochs
     timesteps           = args.timesteps
     leak                = args.leak
@@ -279,11 +279,12 @@ if __name__ == '__main__':
     kernel_size         = args.kernel_size
     test_acc_every_batch= False
     train_acc_batches   = args.train_acc_batches
-    dataset_path        = 'D:/Users/shafi/OneDrive/OneDrive - University of Toronto/ISML_22/snn_conversion_2/data/processed/Rat4Training_Fold1.mat'
-    # save_dir            = args.save_dir
-    save_dir            = 'D:/Users/shafi/OneDrive/OneDrive - University of Toronto/ISML_22/snn_conversion_2/trained_models/snn'
-    # save_name           = args.save_name
-    save_name           = 'snn_escape_net_ann_accuracy_timesteps_number'
+    dataset_path        = args.dataset_path
+    # dataset_path        = 'D:/Users/shafi/OneDrive/OneDrive - University of Toronto/ISML_22/snn_conversion_2/data/processed/Rat4Training_Fold1.mat'
+    save_dir            = args.save_dir
+    # save_dir            = 'D:/Users/shafi/OneDrive/OneDrive - University of Toronto/ISML_22/snn_conversion_2/trained_models/snn'
+    save_name           = args.save_name
+    # save_name           = 'snn_escape_net_ann_accuracy_timesteps_number'
 
     save_path = os.path.join(save_dir, save_name)
     try:
