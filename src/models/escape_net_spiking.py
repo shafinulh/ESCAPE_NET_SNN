@@ -67,7 +67,6 @@ class LinearSpike(torch.autograd.Function):
         grad       = LinearSpike.gamma*F.threshold(1.0-torch.abs(input), 0, 0)
         return grad*grad_input, None
 
-
 class ESCAPE_NET_SNN_STDB(nn.Module):
   def __init__(self, model_name, activation='Linear', labels=3, timesteps=100, leak=1.0, default_threshold = 1.0, alpha=0.3, beta=0.01, dropout=0.2, kernel_size=8, dataset='RAT4'):
     super().__init__()
@@ -97,6 +96,7 @@ class ESCAPE_NET_SNN_STDB(nn.Module):
     self.mask 			 = {}
     self.spike 			 = {}
     self.spikes      = {}
+    self.spiketrains = {}
     self.avg_spike_dict = {}
     self.conv_layers = []
     self.fc_layers   = []
@@ -208,7 +208,7 @@ class ESCAPE_NET_SNN_STDB(nn.Module):
                 
       if isinstance(self.features[l], nn.Conv2d):
         self.mem[l] 		= torch.zeros(self.batch_size, self.features[l].out_channels, self.width, self.height)
-      
+        self.spiketrains[l] = torch.zeros(self.timesteps, self.batch_size*self.features[l].out_channels * self.width * self.height)
       elif isinstance(self.features[l], nn.Dropout):
         self.mask[l] = self.features[l](torch.ones(self.mem[l-2].shape))
 
@@ -222,6 +222,7 @@ class ESCAPE_NET_SNN_STDB(nn.Module):
       
       if isinstance(self.classifier[l], nn.Linear):
         self.mem[prev+l] 		= torch.zeros(self.batch_size, self.classifier[l].out_features)
+        self.spiketrains[prev + l] = torch.zeros(self.timesteps, self.batch_size*self.classifier[l].out_features)
       
       elif isinstance(self.classifier[l], nn.Dropout):
         self.mask[prev+l] = self.classifier[l](torch.ones(self.mem[prev+l-2].shape))
@@ -252,6 +253,8 @@ class ESCAPE_NET_SNN_STDB(nn.Module):
           mem_thr 		= (self.mem[l]/self.threshold[l]) - 1.0
           out 			= self.act_func(mem_thr, (t-1-self.spike[l]))
           self.spikes[l] = self.spikes[l] + out
+          self.spiketrains[l][t] = out.flatten()
+
           rst 			= self.threshold[l]* (mem_thr>0).float()
           self.spike[l] 	= self.spike[l].masked_fill(out.bool(),t-1)
           self.mem[l] 	= (self.leak*self.mem[l] + self.features[l](out_prev) - rst)
@@ -281,6 +284,7 @@ class ESCAPE_NET_SNN_STDB(nn.Module):
           mem_thr 			= (self.mem[prev+l]/self.threshold[prev+l]) - 1.0
           out 				= self.act_func(mem_thr, (t-1-self.spike[prev+l]))
           self.spikes[prev+l] = self.spikes[prev+l] + out
+          self.spiketrains[prev + l][t] = out.flatten()
           rst 				= self.threshold[prev+l] * (mem_thr>0).float()
           self.spike[prev+l] 	= self.spike[prev+l].masked_fill(out.bool(),t-1)
           self.mem[prev+l] 	= (self.leak*self.mem[prev+l] + self.classifier[l](out_prev) - rst)
@@ -329,13 +333,7 @@ def count_spikes(model, spike):
   return batch_avg_spikerates
 
 def test():
-    # Seed random number
-    torch.manual_seed(0)
-    np.random.seed(0)
-    torch.cuda.manual_seed(0)
-    torch.cuda.manual_seed_all(0)
-
-    net = ESCAPE_NET_SNN_STDB('ESCAPE_NET', timesteps = 100)
+    net = ESCAPE_NET_SNN_STDB('ESCAPE_NET', timesteps = 10)
     x = torch.randn(1,1,56,100)
     net = nn.DataParallel(net) 
     if torch.cuda.is_available():
@@ -349,6 +347,9 @@ def test():
     avg_spikerates = count_spikes(net, net.module.spikes)
     print(avg_spikerates)
     # print(y.size())
+    spiketrains_hist = net.module.spiketrains
+    # print(torch.sum(spiketrains_hist[10]))
+    print(spiketrains_hist[10])
 
 if __name__ == '__main__':
   test()

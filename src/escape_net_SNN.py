@@ -24,50 +24,7 @@ from sklearn import model_selection
 
 import make_dataset
 from models import escape_net_spiking as SNN
-
-class CustomDataset(Dataset):
-    """Modifying torch built-in dataset class to be capable of handling the RAT dataset"""
-    def __init__(self, data_all, labels, transform=None, target_transform=None):
-        self.labels = labels
-        self.data_all = data_all
-        self.transform = transform
-        self.target_transform = target_transform
-
-    def __len__(self):
-        return len(self.labels)
-
-    def __getitem__(self, idx):
-        data = self.data_all[idx]
-        label = self.labels[idx][0]-1
-        if self.transform:
-            data = self.transform(data)
-            data = data.float()
-        if self.target_transform:
-            label = self.target_transform(label)
-        return data, label
-
-class AverageMeter(object):
-    """Computes and stores the average and current value"""
-    def __init__(self, name, fmt=':f'):
-        self.name = name
-        self.fmt = fmt
-        self.reset()
-
-    def reset(self):
-        self.val = 0
-        self.avg = 0
-        self.sum = 0
-        self.count = 0
-
-    def update(self, val, n=1):
-        self.val = val
-        self.sum += val * n
-        self.count += n
-        self.avg = self.sum / self.count
-
-    def __str__(self):
-        fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
-        return fmtstr.format(**self.__dict__)
+from utils import CustomDataset, AverageMeter
 
 def find_threshold(batch_size=512, timesteps=2500, architecture='ESCAPE_NET'):
 

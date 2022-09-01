@@ -1,66 +1,24 @@
 import argparse
+import os
+import pdb
+import sys
+import datetime
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms, models
 from matplotlib import pyplot as plt
-import pdb
-import sys
-import datetime
-import os
+
 import numpy as np
-from models import escape_net
-import os
 import pandas as pd
 from torchvision.io import read_image
 from torch.utils.data import Dataset
 
 from models import escape_net as ANN
 from data import make_dataset as Processor
-
-class CustomImageDataset(Dataset):
-    def __init__(self, data_all, labels, transform=None, target_transform=None):
-        self.labels = labels
-        self.data_all = data_all
-        self.transform = transform
-        self.target_transform = target_transform
-
-    def __len__(self):
-        return len(self.labels)
-
-    def __getitem__(self, idx):
-        data = self.data_all[idx]
-        label = self.labels[idx][0]-1
-        if self.transform:
-            data = self.transform(data)
-            data = data.float()
-        if self.target_transform:
-            label = self.target_transform(label)
-        return data, label
-        
-class AverageMeter(object):
-    """Computes and stores the average and current value"""
-    def __init__(self, name, fmt=':f'):
-        self.name = name
-        self.fmt = fmt
-        self.reset()
-
-    def reset(self):
-        self.val = 0
-        self.avg = 0
-        self.sum = 0
-        self.count = 0
-
-    def update(self, val, n=1):
-        self.val = val
-        self.sum += val * n
-        self.count += n
-        self.avg = self.sum / self.count
-
-    def __str__(self):
-        fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
-        return fmtstr.format(**self.__dict__)
+from utils import CustomDataset, AverageMeter
 
 def train(epoch, loader):
 
@@ -92,18 +50,18 @@ def train(epoch, loader):
         losses.update(loss.item(), data.size(0))
         top1.update(correct.item()/data.size(0), data.size(0))
         
-    f.write('\n Epoch: {}, lr: {:.1e}, train_loss: {:.4f}, train_acc: {:.4f}'.format(
-            epoch,
-            learning_rate,
-            losses.avg,
-            top1.avg
-            )
+    f.write(
+        '\n Epoch: {}, lr: {:.1e}, train_loss: {:.4f}, train_acc: {:.4f}'.format(
+        epoch,
+        learning_rate,
+        losses.avg,
+        top1.avg
         )
+    )
     history.setdefault('train_loss', []).append(losses.avg)
     history.setdefault('train_acc', []).append(top1.avg)
 
 def test(loader):
-
     losses = AverageMeter('Loss')
     top1   = AverageMeter('Acc@1')
 
@@ -153,7 +111,7 @@ def test(loader):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train ANN to be later converted to SNN', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--gpu',                    default=True,               type=bool,      help='use gpu')
+    parser.add_argument('--gpu', default=True,               type=bool,      help='use gpu')
     parser.add_argument('--log',                    action='store_true',                        help='to print the output on terminal or to log file')
     parser.add_argument('-s','--seed',              default=120,                type=int,       help='seed for random number')
     parser.add_argument('--dataset',                default='RAT4',             type=str,       help='dataset name', choices=['MNIST','CIFAR10','CIFAR100'])
@@ -209,6 +167,7 @@ if __name__ == '__main__':
     try:
         os.mkdir(save_path)
     except OSError:
+        #handle this exception better
         pass 
 
     log_file = save_name_base + '.log'
@@ -227,6 +186,9 @@ if __name__ == '__main__':
         f.write('\n\t {:20} : {}'.format(arg, getattr(args,arg)))
         
     # Training settings
+    '''
+    separation of concerns
+    '''
     if torch.cuda.is_available() and args.gpu:
         torch.set_default_tensor_type('torch.cuda.FloatTensor')
     
