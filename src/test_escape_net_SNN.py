@@ -3,9 +3,9 @@
 # ---------------------------------------------------
 from __future__ import print_function
 
-import datetime
 import os
 import sys
+from datetime import datetime
 
 import numpy as np
 import torch
@@ -72,7 +72,7 @@ def evaluate_sample(samples_to_test=1):
     # create appropriate figures based on the inference of single image
     plot_layerwise_spikerates(layer_spikes, conv_layers, save_path)
     plot_spiketrains(spiketrains, layer_spikerates, save_path)
-    # plot_neuron_spike_distribution(layer_spikes, save_path)
+    plot_neuron_spike_distribution(layer_spikes, save_path)
 
     """manually create the model dictionary 
         conv_layer: (filt_size, height, width, in_features, out_features, layer_avg_spikerate)
@@ -110,7 +110,6 @@ def inference(data_loader):
                 data, target = data.cuda(), target.cuda()
 
             output = model(data)
-            print(output.dtype, target.dtype)
             target = target.long()
             loss = F.cross_entropy(output, target)
             pred = output.max(1, keepdim=True)[1]
@@ -142,28 +141,18 @@ def inference(data_loader):
                 losses.avg,
                 top1.avg,
                 max_accuracy,
-                datetime.timedelta(
-                    seconds=(datetime.datetime.now() - start_time).seconds
-                ),
+                datetime.timedelta(seconds=(datetime.now() - start_time).seconds),
             )
         )
         # Calculate the spikerate of each layer averaged over all samples
         avg_spikerates = get_avg_spikerates(
             batch_avg_spikerates, len(data_loader.dataset)
         )
-        get_confusion_matrix(targets, preds)
+        cm = confusion_matrix(targets, preds)
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+        disp.plot()
+        plt.show()
         return avg_spikerates
-
-
-def get_confusion_matrix(targets, preds):
-    """
-    basic plot of the trained SNN's predictions. COMPARE to the corresponding ANN
-    """
-    classes = {0: "A", 1: "2", 2: "3"}
-    cm = confusion_matrix(targets, preds)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-    disp.plot()
-    plt.show()
 
 
 if __name__ == "__main__":
@@ -201,21 +190,27 @@ if __name__ == "__main__":
     save_dir = args.save_dir
     save_name = args.save_name
 
+    version = 0
     save_path = os.path.join(save_dir, save_name)
-    try:
-        os.mkdir(save_path)
-    except OSError:
-        pass
 
-    log_file = save_name + ".log"
+    save = False if save_path == "" else False
+
+    while True and save:
+        try:
+            os.mkdir(os.path.join(save_path, "_", version))
+            break
+        except OSError:
+            version += 1
+
+    log_file = save_name + ".log" if save else ""
     log_file = os.path.join(save_path, log_file)
 
-    if args.log:
+    if log_file and args.log:
         f = open(log_file, "w", buffering=1)
     else:
         f = sys.stdout
 
-    f.write("\n Run on time: {}".format(datetime.datetime.now()))
+    f.write("\n Run on time: {}".format(datetime.now()))
 
     f.write("\n\n Arguments: ")
     for arg in vars(args):
@@ -305,7 +300,7 @@ if __name__ == "__main__":
     max_accuracy = 0
     avg_spike_dict = {}
 
-    start_time = datetime.datetime.now()
+    start_time = datetime.now()
 
     evaluate_sample(1)
     # avg_spikerates = inference(test_loader)

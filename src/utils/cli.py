@@ -18,7 +18,7 @@ def SNN_arg_parser():
     )
     parser.add_argument(
         "--pretrained_snn",
-        default="D:/Users/shafi/OneDrive/OneDrive - University of Toronto/ISML_22/snn_conversion_2/trained_models/snn/snn_escape_net_727_28_2/snn_escape_net_727_28_1.pth",
+        default="",
         type=str,
         help="pretrained SNN for inference",
     )
@@ -101,19 +101,17 @@ def SNN_arg_parser():
     )
     parser.add_argument(
         "--dataset_path",
-        default="D:/Users/shafi/OneDrive/OneDrive - University of Toronto/ISML_22/snn_conversion_2/data/processed/Rat4Training_Fold1.mat",
+        default="",
         type=str,
         help="",
     )
     parser.add_argument(
         "--save_dir",
-        default="D:/Users/shafi/OneDrive/OneDrive - University of Toronto/ISML_22/snn_conversion_2/trained_models/snn",
+        default="",
         type=str,
         help="",
     )
-    parser.add_argument(
-        "--save_name", default="snn_escape_net_727_28_2", type=str, help=""
-    )
+    parser.add_argument("--save_name", default="", type=str, help="")
     parser.add_argument("-f")
     args = parser.parse_args()
     return args
@@ -222,7 +220,7 @@ def SNN_arg_parser():
     )
     parser.add_argument(
         "--dataset_path",
-        default="D:/Users/shafi/OneDrive/OneDrive - University of Toronto/ISML_22/snn_conversion_2/data/processed/Rat4Training_Fold1.mat",
+        default="",
         type=str,
         help="",
     )
@@ -251,7 +249,7 @@ def ANN_arg_parser():
         default="RAT4",
         type=str,
         help="dataset name",
-        choices=["MNIST", "CIFAR10", "CIFAR100"],
+        choices=["RAT4"],
     )
     parser.add_argument("--batch_size", default=64, type=int, help="minibatch size")
     parser.add_argument(
@@ -260,17 +258,7 @@ def ANN_arg_parser():
         default="IG2",
         type=str,
         help="network architecture",
-        choices=[
-            "VGG5",
-            "VGG9",
-            "VGG11",
-            "VGG13",
-            "VGG16",
-            "VGG19",
-            "RESNET12",
-            "RESNET20",
-            "RESNET34",
-        ],
+        choices=["IG1", "IG2", "ESCAPE_NET"],
     )
     parser.add_argument(
         "-lr",
@@ -327,7 +315,7 @@ def ANN_arg_parser():
     )
     parser.add_argument(
         "--dataset_path",
-        default="D:/Users/shafi/OneDrive/OneDrive - University of Toronto/ISML_22/snn_conversion_2/data/processed/Rat4Training_Fold1.mat",
+        default="",
         type=str,
         help="",
     )

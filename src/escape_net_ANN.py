@@ -1,6 +1,6 @@
-import datetime
 import os
 import sys
+from datetime import datetime
 
 import numpy as np
 import torch
@@ -41,7 +41,7 @@ def train(epoch, loader):
     # total_correct   = 0
     model.train()
     for batch_idx, (data, target) in enumerate(loader):
-        start_time = datetime.datetime.now()
+        start_time = datetime.now()
 
         if torch.cuda.is_available() and args.gpu:
             data, target = data.cuda(), target.cuda()
@@ -112,9 +112,7 @@ def test(loader):
                 losses.avg,
                 top1.avg,
                 max_accuracy,
-                datetime.timedelta(
-                    seconds=(datetime.datetime.now() - start_time).seconds
-                ),
+                datetime.timedelta(seconds=(datetime.now() - start_time).seconds),
             )
         )
         history.setdefault("test_loss", []).append(losses.avg)
@@ -167,7 +165,7 @@ if __name__ == "__main__":
     else:
         f = sys.stdout
 
-    f.write("\n Run on time: {}".format(datetime.datetime.now()))
+    f.write("\n Run on time: {}".format(datetime.now()))
 
     f.write("\n\n Arguments:")
     for arg in vars(args):
@@ -302,7 +300,7 @@ if __name__ == "__main__":
         max_accuracy = 0
         history = {}
         for epoch in range(1, epochs):
-            start_time = datetime.datetime.now()
+            start_time = datetime.now()
             train(epoch, train_loader)
             test(test_loader)
             np.save(history_save_path, history)

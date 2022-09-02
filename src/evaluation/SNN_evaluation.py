@@ -25,10 +25,12 @@ def plot_input_image(data_loader, save_path):
         label = target[i]
 
         plt.imshow(img, cmap="viridis")
-        plt.savefig(os.path.join(save_path, f"raw_input_{i}.png"))
+        if save_path != "":
+            plt.savefig(os.path.join(save_path, f"raw_input_{i}.png"))
         plt.clf()
         plt.imshow(spike_img, cmap="viridis")
-        plt.savefig(os.path.join(save_path, f"raw_spike_input_{i}.png"))
+        if save_path != "":
+            plt.savefig(os.path.join(save_path, f"raw_spike_input_{i}.png"))
         plt.clf()
         # print(f"Label: {label}")
         # print(spike_img.shape)
@@ -53,7 +55,8 @@ def plot_layerwise_spikerates(layer_spikes, conv_layers, save_path):
             plt.suptitle(
                 f"{layer}Conv2D_{spikes.shape[0]}x{spikes.shape[1]}x{features[0].shape[0]}"
             )
-            plt.savefig(os.path.join(save_path, f"layer_spikes_{layer}.png"))
+            if save_path != "":
+                plt.savefig(os.path.join(save_path, f"layer_spikes_{layer}.png"))
             plt.clf()
         else:
             plt.rcParams["figure.figsize"] = (2, 6)
@@ -67,7 +70,8 @@ def plot_layerwise_spikerates(layer_spikes, conv_layers, save_path):
             plt.imshow(spikes, cmap="viridis")
             plt.colorbar()
             plt.title(f"{layer}Dense_{spikes.numel()}")
-            plt.savefig(os.path.join(save_path, f"layer_spikes_{layer}.png"))
+            if save_path != "":
+                plt.savefig(os.path.join(save_path, f"layer_spikes_{layer}.png"))
             plt.clf()
 
 
@@ -116,7 +120,8 @@ def plot_spiketrains(spiketrains, layer_spikerates, save_path):
         fig.suptitle(
             f"Spike Trains for Layer {layer} consisting of {spiketrain.shape[1]} neurons.\nOverall Spiking Rate of {layer_spikerates[layer]: .3f}"
         )
-        plt.savefig(os.path.join(save_path, f"spiketrains_{layer}.png"))
+        if save_path != "":
+            plt.savefig(os.path.join(save_path, f"spiketrains_{layer}.png"))
         plt.clf()
 
 
@@ -135,7 +140,8 @@ def plot_neuron_spike_distribution(layer_spikes, save_path):  # takes very long 
         plt.title(f"Spike Histogram for Layer {layer}")
         plt.xlabel(f"Number of Spikes")
         plt.ylabel(f"Number of Neurons")
-        plt.savefig(os.path.join(save_path, f"spike_histogram_{layer}.png"))
+        if save_path != "":
+            plt.savefig(os.path.join(save_path, f"spike_histogram_{layer}.png"))
         plt.clf()
 
 

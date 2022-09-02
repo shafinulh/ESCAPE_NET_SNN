@@ -3,9 +3,9 @@
 # ---------------------------------------------------
 from __future__ import print_function
 
-import datetime
 import os
 import sys
+from datetime import datetime
 
 import numpy as np
 import torch
@@ -202,9 +202,7 @@ def test(epoch):
                 losses.avg,
                 top1.avg,
                 max_accuracy,
-                datetime.timedelta(
-                    seconds=(datetime.datetime.now() - start_time).seconds
-                ),
+                datetime.timedelta(seconds=(datetime.now() - start_time).seconds),
             )
         )
         history.setdefault("test_loss", []).append(losses.avg)
@@ -267,7 +265,7 @@ if __name__ == "__main__":
     else:
         f = sys.stdout
 
-    f.write("\n Run on time: {}".format(datetime.datetime.now()))
+    f.write("\n Run on time: {}".format(datetime.now()))
 
     f.write("\n\n Arguments: ")
     for arg in vars(args):
@@ -435,7 +433,7 @@ if __name__ == "__main__":
     history_save_path = os.path.join(save_path, "history.npy")
 
     for epoch in range(1, epochs):
-        start_time = datetime.datetime.now()
+        start_time = datetime.now()
         train(epoch)
         test(epoch)
         np.save(history_save_path, history)
