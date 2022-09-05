@@ -129,5 +129,5 @@ Layers Summary:
 **Figure 8. Energy Consumption throughout Simulation**  
 ![image](https://user-images.githubusercontent.com/58120600/188378993-96a51c04-a3f3-441c-aa09-1d68959b8e55.png)  
 
-#How to Use Repository
+# How to Use Repository
 
