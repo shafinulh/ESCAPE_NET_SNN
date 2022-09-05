@@ -116,7 +116,7 @@ Layers Summary:
 <img src="https://user-images.githubusercontent.com/58120600/188373354-866b4dd2-cc6e-4f1b-a0a6-ec615e92b073.png" width=20% height=20%><img src="https://user-images.githubusercontent.com/58120600/188373378-898c3533-7b1d-42d7-a129-8a1ce99fca1c.png" width=20% height=20%><img src="https://user-images.githubusercontent.com/58120600/188373394-4659c89c-5d8a-4a8d-843e-d614ab5ec754.png" width=20% height=20%><img src="https://user-images.githubusercontent.com/58120600/188373406-20fdb551-3d22-4154-a39a-6f39869a71cb.png" width=20% height=20%><img src="https://user-images.githubusercontent.com/58120600/188373417-16d65d4a-5612-493d-a500-dc8460e1e184.png" width=20% height=20%>
 * *Note how the sparsity of spikes increases as you get deeper into the network.*
 
-**Figure 5. Histogram of the number of spikes over the simulation duration for every neuron in each layer** (click images to zoom)
+**Figure 5. Histogram of the number of spikes over the simulation duration for every neuron in each layer**  
 <img src="https://user-images.githubusercontent.com/58120600/188377359-e7033a3c-38c8-484e-b6aa-4a22e5042396.png" width=25% height=25%><img src="https://user-images.githubusercontent.com/58120600/188374211-ef9143e9-d878-4495-a32b-40c6f7dbf716.png" width=25% height=25%><img src="https://user-images.githubusercontent.com/58120600/188374281-9327afb2-cb39-4961-9ab6-b4e3d3daf47e.png" width=25% height=25%><img src="https://user-images.githubusercontent.com/58120600/188374383-ae76d36c-b4c2-4c8a-bf46-405b17bacd22.png" width=25% height=25%>
 * Note how around 90% of the neurons in each layer do not spike once
 * This means that a majority of the pixels in the original spatio-temporal signatures of the RAT dataset carry very little information
