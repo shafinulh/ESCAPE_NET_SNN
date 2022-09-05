@@ -20,17 +20,24 @@ The goal of this summer's work was to create a more efficient implementation of 
 The energy model for a CNN implemented on a Von-Neumann Architecture is as follows: [3]  
 
 <p align="center">
-$E_l^{CNN} = C_l^iC_l^ok^3E_{read} + C_l^iC_l^ok^3H_l^oW_l^oE_{MAC} + P_{leak}T_l^{CNN}$
+$E_l^{CNN} = C_l^iC_l^ok^2E_{read} + C_l^iC_l^ok^2H_l^oW_l^oE_{MAC} + P_{leak}T_l^{CNN}$
 </p>  
 
-  * Where the 1st, 2nd, and 3rd terms are the energy in reading from memory, performing the calculations and static leakage during inference respectively
+* Where $C_l^i$ and $C_l^o$ are the number of input and output feature maps, 
+* $k$ is the filter dimension, 
+* $H_l^o$ and $W_l^o$ are the dimensions of the output feature maps, 
+* $E_{read}$ is the energy required to read every weight from memory, 
+* $E_{MAC}$ is the energy required to perform each operation,
+* $P_{leak}$ is the power lost from leakage, and
+* $T_l^{CNN}$ is the latency of the inference.  
+* The 1st, 2nd, and 3rd terms are the energy in reading from memory, performing the calculations and static leakage during inference respectively
 
 Similarly, the energy model can be extended to an SNN by keeping most of the terms with a couple key differences [4]
 * Define **$\lambda$** as the average spiking rate of a layer which is equivalent to the total number of spikes over the simulation duration divided by the number of neurons. 
 * An SNN does not feature any large scale matrix multiplication as the IF neurons can be realized using only adders and comparators. Therefore, we need to consider the energy of an AC operation instead of an MAC which is significantly less energy consuming.  
 
 <p align="center">
-$E_l^{SNN} = C_l^iC_l^ok^3E_{read} + C_l^iC_l^ok^3H_l^oW_l^o\lambda E_{AC} + P_{leak}T_l^{SNN}$
+$E_l^{SNN} = C_l^iC_l^ok^2E_{read} + C_l^iC_l^ok^2H_l^oW_l^o\lambda E_{AC} + P_{leak}T_l^{SNN}$
 </p>
 
 Simplifications can be made to approximate the energy model for our purposes. 
@@ -41,11 +48,11 @@ Simplifications can be made to approximate the energy model for our purposes.
 
 
 <p align="center">
-$E_l^{CNN} = C_l^iC_l^ok^3H_l^oW_l^oE_{MAC}$
+$E_l^{CNN} = C_l^iC_l^ok^2H_l^oW_l^oE_{MAC}$
 </p>  
 
 <p align="center">
-$E_l^{SNN} = C_l^iC_l^ok^3H_l^oW_l^o\lambda E_{AC}$
+$E_l^{SNN} = C_l^iC_l^ok^2H_l^oW_l^o\lambda E_{AC}$
 </p>
 
 <p align="center">
