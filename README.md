@@ -81,6 +81,7 @@ Relevant constant values from literature
   * **Figure 2. Sample Poisson Generated Input Spikes**
     * ![image](https://user-images.githubusercontent.com/58120600/188369203-fc561fed-1852-43f9-8b8a-da3ff677041a.png)
 ## Take converted SNN and use its weights and thresholds as an initialization for spike-based backpropagation (STDB)
+**(Will add more details)**
 * This was done to deal with the issue of long simulation times of a converted SNN. Methods adopted from [12].
 * Perform incremental spike-timing dependant backpropagation (STDB) on the initialized network. The backpropagation is done using a surrogate gradient function to alleviate the non-differentiability of the binary spike. 
 * **Baseline results from paper:** 
