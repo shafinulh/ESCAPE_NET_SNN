@@ -164,7 +164,7 @@ Layers Summary:
 **Figure 7. Normalized Energy Consumption in ANN vs. SNN**  
 ![image](https://user-images.githubusercontent.com/58120600/188378726-14464b55-b583-4a76-8f16-f95da5794f44.png)  
 **Figure 8. Energy Consumption throughout Simulation**  
-![image](https://user-images.githubusercontent.com/58120600/188378993-96a51c04-a3f3-441c-aa09-1d68959b8e55.png)  
+![image](https://user-images.githubusercontent.com/58120600/188943725-d7ed5243-afe3-4528-854f-e08bb25c9db7.png)
 
 # How to Use Repository
 
